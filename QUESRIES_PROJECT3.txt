@@ -1,0 +1,45 @@
+
+*QUERY 1*/
+
+SELECT Playlist.Name, COUNT(*) as NuMTracks
+From Playlist
+Join PlaylistTrack ON Playlist.PlaylistId = PlaylistTrack.PlaylistId
+Group BY playlist.PlaylistId;
+ORDER BY numtracks DESC;
+
+/*QUERY 2*/
+
+SELECT BillingCountry, MAX(GenreCount) AS TopGenreCount, GenreName
+FROM (
+     SELECT BillingCountry, COUNT(*) AS GenreCount, Genre.Name AS GenreName
+	 FROM Invoice
+	 INNER JOIN InvoiceLine ON Invoice.InvoiceId = InvoiceLine.InvoiceId
+	 INNER JOIN Track ON InvoiceLine.TrackId = Track.TrackId
+	 INNER JOIN Genre ON Track.GenreId = Genre.GenreId
+	 GROUP BY BillingCountry, Genre.Name
+	 )
+GROUP BY BillingCountry
+ORDER BY TopGenreCount DESC
+LIMIT 10;	
+
+/*QUERY 3*/
+
+SELECT Artist.Name AS ArtistName, COUNT(*) AS totaltracks
+FROM Track
+INNER JOIN Album ON Track.AlbumId = Album.AlbumId
+INNER JOIN Artist ON Album.ArtistId = Artist.ArtistId
+GROUP BY ArtistName
+ORDER BY TotalTracks DESC
+LIMIT 10;
+
+/*QUERY 4*/
+
+SELECT Artist.Name As ArtistName, SUM(InvoiceLine.UnitPrice * InvoiceLine.Quantity) AS totalEarnings
+FROM InvoiceLine
+INNER JOIN Track ON InvoiceLine.TrackId = Track.TrackId
+INNER JOIN Album ON Track.AlbumId = Album.AlbumId
+INNER JOIN Artist ON Album.ArtistId = Artist.ArtistId
+GROUP BY ArtistName
+ORDER BY totalEarnings DESC
+LIMIT 1;
+
